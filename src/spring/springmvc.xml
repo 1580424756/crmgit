@@ -13,7 +13,7 @@
     <!--读取解决硬编码的文件-->
     <context:property-placeholder location="classpath:resources.properties" />
 
-    <!-- 配置注解驱动 -->
+    <!-- 配置注解驱动 处理器映射器，处理器适配器 -->
     <mvc:annotation-driven />
 
     <!--对静态资源的放行 /时拦截所有只放过jsp-->

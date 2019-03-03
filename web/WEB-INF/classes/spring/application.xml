@@ -9,57 +9,63 @@
 	http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.0.xsd">
 
     <!-- 配置 读取properties文件 jdbc.properties -->
-    <context:property-placeholder location="classpath:jdbc.properties" />
+    <context:property-placeholder location="classpath:jdbc.properties"/>
 
     <!-- 配置 数据源 -->
     <bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource">
-        <property name="driverClassName" value="${jdbc.driver}" />
-        <property name="url" value="${jdbc.url}" />
-        <property name="username" value="${jdbc.username}" />
-        <property name="password" value="${jdbc.password}" />
+        <property name="driverClassName" value="${jdbc.driver}"/>
+        <property name="url" value="${jdbc.url}"/>
+        <property name="username" value="${jdbc.username}"/>
+        <property name="password" value="${jdbc.password}"/>
     </bean>
 
     <!-- 配置SqlSessionFactory -->
     <bean class="org.mybatis.spring.SqlSessionFactoryBean">
         <!-- 设置MyBatis核心配置文件 -->
-        <property name="configLocation" value="classpath:mybatis/SqlMapConfig.xml" />
+        <property name="configLocation" value="classpath:mybatis/SqlMapConfig.xml"/>
         <!-- 设置数据源 -->
-        <property name="dataSource" ref="dataSource" />
+        <property name="dataSource" ref="dataSource"/>
     </bean>
 
-    <!-- 配置Mapper扫描 -->
+    <!-- 配置Mapper扫描，动态代理开发就不用再dao层 -->
     <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <!--是因为我们在mybatis的xml文件配置了上图这个bean,
+        它会去将dao这个层中的mapper(也就是我们的接口)都生成实现类,
+        然后交给spring管理(因为mybatis.xml文件我们最终还是导入了spring容器中),
+        所以我们这里不对这些接口用@repository注解,也是一样可以用它的实现类,
+        (这也是我们写项目时,有时感觉完全是没用到@repository注解的原因,因为没有什么必要)
+        而idea报红线警告,可能是idea自己的原因,这个在我们对它对应的接口用@repository注解后,红线警告会消失,运行也完全没问题-->
         <!-- 设置Mapper扫描包 -->
-        <property name="basePackage" value="com.crm.mapper" />
+        <property name="basePackage" value="com.crm.mapper"/>
     </bean>
 
     <!-- 事务管理器 -->
-    <bean id="transactionManager"	class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
         <!-- 数据源 -->
-        <property name="dataSource" ref="dataSource" />
+        <property name="dataSource" ref="dataSource"/>
     </bean>
 
     <!-- 通知 -->
     <tx:advice id="txAdvice" transaction-manager="transactionManager">
         <tx:attributes>
             <!-- 传播行为 -->
-            <tx:method name="save*" propagation="REQUIRED" />
-            <tx:method name="insert*" propagation="REQUIRED" />
-            <tx:method name="add*" propagation="REQUIRED" />
-            <tx:method name="create*" propagation="REQUIRED" />
-            <tx:method name="delete*" propagation="REQUIRED" />
-            <tx:method name="update*" propagation="REQUIRED" />
-            <tx:method name="find*" propagation="SUPPORTS" read-only="true" />
-            <tx:method name="select*" propagation="SUPPORTS" read-only="true" />
-            <tx:method name="get*" propagation="SUPPORTS" read-only="true" />
-            <tx:method name="query*" propagation="SUPPORTS" read-only="true" />
+            <tx:method name="save*" propagation="REQUIRED"/>
+            <tx:method name="insert*" propagation="REQUIRED"/>
+            <tx:method name="add*" propagation="REQUIRED"/>
+            <tx:method name="create*" propagation="REQUIRED"/>
+            <tx:method name="delete*" propagation="REQUIRED"/>
+            <tx:method name="update*" propagation="REQUIRED"/>
+            <tx:method name="find*" propagation="SUPPORTS" read-only="true"/>
+            <tx:method name="select*" propagation="SUPPORTS" read-only="true"/>
+            <tx:method name="get*" propagation="SUPPORTS" read-only="true"/>
+            <tx:method name="query*" propagation="SUPPORTS" read-only="true"/>
         </tx:attributes>
     </tx:advice>
 
     <!-- 切面 -->
     <aop:config>
         <aop:advisor advice-ref="txAdvice"
-                     pointcut="execution(* com.crm.service.*.*(..))" />
+                     pointcut="execution(* com.crm.service.*.*(..))"/>
     </aop:config>
 
 </beans>

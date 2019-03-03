@@ -27,7 +27,7 @@
         <property name="dataSource" ref="dataSource"/>
     </bean>
 
-    <!-- 配置Mapper扫描，动态代理开发就不用再dao层 -->
+    <!-- 配置Mapper扫描，动态代理开发就不用再dao层配置注解了@repository注解 -->
     <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
         <!--是因为我们在mybatis的xml文件配置了上图这个bean,
         它会去将dao这个层中的mapper(也就是我们的接口)都生成实现类,
